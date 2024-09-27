@@ -66,6 +66,8 @@ install-r-deps:
 	$(ACTIVATE_ENV) && $(RSCRIPT) -e "devtools::install_github('ParkerICI/vite')"
 	@echo "Installing Spectre..." 
 	$(ACTIVATE_ENV) && $(RSCRIPT) -e "devtools::install_github(repo = 'immunedynamics/spectre')"
+	@ echo "Installing clustR..."
+	$(ACTIVATE_ENV) && $(RSCRIPT) -e "devtools::install('~/git/shomei/services/backend/clustR')"
 
 
 
@@ -78,6 +80,7 @@ check-r-deps:
 	$(ACTIVATE_ENV) && $(R) -q -e "library('FastPG')"
 	$(ACTIVATE_ENV) && $(R) -q -e "library('vite')"
 	$(ACTIVATE_ENV) && $(R) -q -e "library('Spectre')"
+	$(ACTIVATE_ENV) && $(R) -q -e "library('clustR')"
 	@echo "Done."
 
 activate-irkernel:
