@@ -87,3 +87,23 @@ activate-irkernel:
 	@echo "Activating IRkernel..."
 	$(ACTIVATE_ENV) && $(R) -q -e "IRkernel::installspec()"
 	@echo "Done."
+
+
+get-shomei-pipeline-ecr-repository-url:
+	ECR_REPOSITORY_URL=$$(aws ecr describe-repositories --repository-names shomei-pipeline | jq -r '.repositories[0].repositoryUri'); \
+	echo "Retrieved ECR_REPOSITORY_URL: $$ECR_REPOSITORY_URL"; \
+	awk -v ecr_url="$$ECR_REPOSITORY_URL" ' \
+		/^[# ]*ECR_REPOSITORY_URL=/ { \
+			sub(/^[# ]*ECR_REPOSITORY_URL=.*/, "ECR_REPOSITORY_URL=" ecr_url); \
+		} \
+		{ print }' .env > .env.tmp && mv .env.tmp .env
+	@echo "ECR_REPOSITORY_URL updated successfully in .env"
+
+run-pipeline-image:
+	curdir=$$(basename $$PWD); \
+	docker run -itd \
+		--name shomei-pipeline_$$curdir \
+		-v ~/git/shomei/services/backend/shomei:/usr/src/backend/shomei \
+		-v ./:/usr/src/$$curdir \
+		-v ~/.ssh:/root/.ssh \
+		$(ECR_REPOSITORY_URL):latest 
